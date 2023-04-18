@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:45 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/18 20:02:23 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/18 20:46:06 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,25 +78,22 @@ void	dummy_handler2(int sig)
 			free(msg);
 			msg = NULL;
 			msg_len = 0;
-			//send sig to client for confirmation
 		}
 	}
 	else
 		get_len(sig, &msg_len);
 }
 
-/*	mandatory works fine, check how to make bonis (taking pid of client)
-	start with whats the third parameter of sigaction*/
-
+/*	things work fine, except if you do 100 000 chars */
 int main(void)
 {
 	struct sigaction sa;
 	
+	sa.sa_handler = &dummy_handler2;
 	ft_putnbr_fd(getpid(), 1);
 	write(1, "\n", 1);
 	while (1)
 	{
-		sa.sa_handler = &dummy_handler2;
 		sigaction(SIGUSR1, &sa, NULL);
 		sigaction(SIGUSR2, &sa, NULL);
 		pause();

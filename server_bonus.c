@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:45 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/18 20:38:33 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/18 21:34:02 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ void	dummy_handler2(int sig)
 		get_len(sig, &msg_len);
 }
 
-/*	mandatory works fine, check how to make bonis (taking pid of client)
-	start with whats the third parameter of sigaction*/
+/* works good-ish, but sometimes when i recieve the confirmation
+	it gives zsh: user-defined signal 1  ./client_bonus 20824 "gthiujertyguhuij" */
 
 int main(void)
 {
