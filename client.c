@@ -6,32 +6,48 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:43 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/16 19:48:11 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/18 11:45:09 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 #include <signal.h>
 #include "libft/libft.h"
+#define	MAX_LEN 4294967295
 
-int main(int arc, char **argv)
+
+int	send_len(char *str, int pid)
+{
+	int	i;
+	size_t	msg_len;
+
+	msg_len = ft_strlen(str);
+	if (msg_len > MAX_LEN)
+	{
+		write(1, "Message too large!\n", 20);
+		return (0);
+	}
+	i = 0;
+	while (i < 32)
+	{
+		kill(pid, SIGUSR1 + (1 & (msg_len >> i)));
+		usleep(100);
+		i++;
+	}
+	return (1);
+}
+
+int main(int argc, char **argv)
 {
 	int pid;
-	int c; // int or char?
-	int	msg_len;
+	char c;
 	int i;
 	
+	if (argc != 3)
+		return (0);
 	pid = ft_atoi(argv[1]);
-	i = 0;
-	msg_len = ft_strlen(argv[2]);
-	//printf("str_len: %i\n", msg_len);
-	while (msg_len > 0)
-	{
-		kill(pid, SIGUSR1);
-		usleep(100);
-		msg_len--;
-	}
-	kill(pid, SIGUSR2);
+	if (!send_len(argv[2], pid))
+		return (0);
 	while(*argv[2] != '\0')
 	{
 		i = 0;
@@ -40,42 +56,8 @@ int main(int arc, char **argv)
 		{
 			usleep(100);
 			kill(pid, SIGUSR1 + (1 & (c >> i)));
-			//write(1, "L", 1);
 			i++;
 		}
-		//write(1, "\n", 1);
 		argv[2]++;
 	}
 }
-
-/* int main(int arc, char **argv)
-{
-	int pid;
-	int c;
-	int	msg_len;
-	
-	pid = ft_atoi(argv[1]);
-	
-	msg_len = ft_strlen(argv[2]);
-	//printf("str_len: %i\n", msg_len);
-	while (msg_len > 0)
-	{
-		kill(pid, SIGUSR1);
-		usleep(100);
-		msg_len--;
-	}
-	kill(pid, SIGUSR2);
-	while(*argv[2])
-	{
-		usleep(100);
-		c = (int)*argv[2];
-		while(c > 0)
-		{
-			kill(pid, SIGUSR1);
-			usleep(100);
-			c--;
-		}
-		kill(pid, SIGUSR2);
-		argv[2]++;
-	}
-} */
