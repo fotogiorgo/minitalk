@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:43 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/18 11:45:09 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/18 12:14:22 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ int	send_len(char *str, int pid)
 
 int main(int argc, char **argv)
 {
-	int pid;
+	int server_pid;
 	char c;
 	int i;
 	
 	if (argc != 3)
 		return (0);
-	pid = ft_atoi(argv[1]);
-	if (!send_len(argv[2], pid))
+	server_pid = ft_atoi(argv[1]);
+	if (!send_len(argv[2], server_pid))
 		return (0);
 	while(*argv[2] != '\0')
 	{
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 		while(i < 8)
 		{
 			usleep(100);
-			kill(pid, SIGUSR1 + (1 & (c >> i)));
+			kill(server_pid, SIGUSR1 + (1 & (c >> i)));
 			i++;
 		}
 		argv[2]++;
