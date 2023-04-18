@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:43 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/18 20:07:00 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/18 20:40:02 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,31 @@ int	send_len(char *str, int pid)
 	while (i < 32)
 	{
 		kill(pid, SIGUSR1 + (1 & (msg_len >> i)));
-		usleep(150);
+		usleep(100);
 		i++;
 	}
 	return (1);
+}
+
+void send_pid(int server_pid)
+{
+	int	i;
+	int	pid;
+	
+	i = 0;
+	pid = getpid();
+	while (i < 32)
+	{
+		kill(server_pid, SIGUSR1 + (1 & (pid >> i)));
+		usleep(100);
+		i++;
+	}
+}
+
+void	wait_confirmation(int sig)
+{
+	write(1, "Message sent!\n", 15);
+	exit(1);
 }
 
 int main(int argc, char **argv)
@@ -42,10 +63,13 @@ int main(int argc, char **argv)
 	int server_pid;
 	char c;
 	int i;
+	struct sigaction sa;
 	
 	if (argc != 3)
 		return (0);
+	sa.sa_handler = &wait_confirmation;
 	server_pid = ft_atoi(argv[1]);
+	send_pid(server_pid);
 	if (!send_len(argv[2], server_pid))
 		return (0);
 	while(*argv[2] != '\0')
@@ -54,10 +78,13 @@ int main(int argc, char **argv)
 		c = *argv[2];
 		while(i < 8)
 		{
-			usleep(200);
+			usleep(100);
 			kill(server_pid, SIGUSR1 + (1 & (c >> i)));
 			i++;
 		}
 		argv[2]++;
 	}
+	while (1)
+		sigaction(SIGUSR1, &sa, NULL);
+	
 }

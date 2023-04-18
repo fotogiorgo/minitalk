@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:45 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/18 20:02:23 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/18 20:38:33 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 
 /* SIGUSR1 == 30 SIGUSR2 == 31 */
 
+unsigned int	client_pid;
+
 void	get_len(int sig, size_t *msg_len)
 {
 	static size_t	len = 0;
@@ -30,6 +32,21 @@ void	get_len(int sig, size_t *msg_len)
 	{
 		*msg_len = len;
 		len = 0;
+		multipliar = 1;
+	}
+}
+
+void	get_pid(int sig)
+{
+	static int	i = 0;
+	static size_t	multipliar = 1;
+
+	i += multipliar * (sig - 30);
+	multipliar *= 2;
+	if (multipliar > INT_MAX)
+	{
+		client_pid = i;
+		i = 0;
 		multipliar = 1;
 	}
 }
@@ -64,7 +81,7 @@ int	get_msg(char *msg, int sig, int msg_len)
 /* SIGUSR1 is for 0  and SIGUSR1 for 1*/
 void	dummy_handler2(int sig)
 {
-	static char		*msg;
+	static char	*msg;
 	static size_t	msg_len;
 	
 	if (msg_len)
@@ -78,7 +95,8 @@ void	dummy_handler2(int sig)
 			free(msg);
 			msg = NULL;
 			msg_len = 0;
-			//send sig to client for confirmation
+			kill(client_pid, SIGUSR1);
+			client_pid = 0;
 		}
 	}
 	else
@@ -96,7 +114,10 @@ int main(void)
 	write(1, "\n", 1);
 	while (1)
 	{
-		sa.sa_handler = &dummy_handler2;
+		if (client_pid == 0)
+			sa.sa_handler = &get_pid;
+		else
+			sa.sa_handler = &dummy_handler2;
 		sigaction(SIGUSR1, &sa, NULL);
 		sigaction(SIGUSR2, &sa, NULL);
 		pause();
