@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:43 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/20 13:20:37 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/20 18:02:47 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,25 +30,10 @@ int	send_len(char *str, int pid)
 	while (i < 32)
 	{
 		kill(pid, SIGUSR1 + (1 & (msg_len >> i)));
-		usleep(100);
+		usleep(50);
 		i++;
 	}
 	return (1);
-}
-
-void	send_pid(int server_pid)
-{
-	int	i;
-	int	pid;
-
-	i = 0;
-	pid = getpid();
-	while (i < 32)
-	{
-		kill(server_pid, SIGUSR1 + (1 & (pid >> i)));
-		usleep(100);
-		i++;
-	}
 }
 
 void	wait_confirmation(int sig)
@@ -62,14 +47,14 @@ void	send_msg(char *str, int server_pid)
 {
 	int	i;
 	int	c;
-	
+
 	while (*str != '\0')
 	{
 		i = 0;
 		c = *str;
 		while (i < 8)
 		{
-			usleep(100);
+			usleep(50);
 			kill(server_pid, SIGUSR1 + (1 & (c >> i)));
 			i++;
 		}
@@ -87,7 +72,6 @@ int	main(int argc, char **argv)
 	sa.sa_handler = &wait_confirmation;
 	sigaction(SIGUSR1, &sa, NULL);
 	server_pid = ft_atoi(argv[1]);
-	send_pid(server_pid);
 	if (!send_len(argv[2], server_pid))
 		return (0);
 	send_msg(argv[2], server_pid);

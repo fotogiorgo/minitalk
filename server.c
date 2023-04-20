@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:45 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/20 15:11:58 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/20 17:54:07 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	get_msg(char *msg, int sig, int msg_len)
 }
 
 /* SIGUSR1 is for 0  and SIGUSR2 for 1*/
-void	get_str(int sig)
+void	get_str(int sig, siginfo_t *info, void *context)
 {
 	static char		*msg;
 	static size_t	msg_len;
@@ -86,15 +86,14 @@ void	get_str(int sig)
 int	main(void)
 {
 	struct sigaction	sa;
-	sa.sa_handler = &get_str;
 
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = &get_str;
 	write(1, "\033[0;36mPID: ", 13);
 	ft_putnbr_fd(getpid(), 1);
 	write(1, "\033[0m\n", 6);
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	while (1)
-	{
-		sigaction(SIGUSR1, &sa, NULL);
-		sigaction(SIGUSR2, &sa, NULL);
 		pause();
-	}
 }

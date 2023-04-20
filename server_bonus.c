@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:45 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/19 19:31:01 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/20 17:54:45 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 #define INT_MAX 2147483648
 
 /* SIGUSR1 == 30 SIGUSR2 == 31 */
-unsigned int	g_client_pid;
 
 void	get_len(int sig, size_t *msg_len)
 {
@@ -30,21 +29,6 @@ void	get_len(int sig, size_t *msg_len)
 	{
 		*msg_len = len;
 		len = 0;
-		multipliar = 1;
-	}
-}
-
-void	get_pid(int sig)
-{
-	static int		i = 0;
-	static size_t	multipliar = 1;
-
-	i += multipliar * (sig - 30);
-	multipliar *= 2;
-	if (multipliar > INT_MAX)
-	{
-		g_client_pid = i;
-		i = 0;
 		multipliar = 1;
 	}
 }
@@ -77,7 +61,7 @@ int	get_msg(char *msg, int sig, int msg_len)
 }
 
 /* SIGUSR1 is for 0  and SIGUSR2 for 1*/
-void	get_str(int sig)
+void	get_str(int sig, siginfo_t *info, void *context)
 {
 	static char		*msg;
 	static size_t	msg_len;
@@ -93,8 +77,7 @@ void	get_str(int sig)
 			free(msg);
 			msg = NULL;
 			msg_len = 0;
-			kill(g_client_pid, SIGUSR1);
-			g_client_pid = 0;
+			kill(info->si_pid, SIGUSR1);
 		}
 	}
 	else
@@ -105,17 +88,13 @@ int	main(void)
 {
 	struct sigaction	sa;
 
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = &get_str;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	write(1, "\033[0;36mPID: ", 13);
 	ft_putnbr_fd(getpid(), 1);
 	write(1, "\033[0m\n", 6);
 	while (1)
-	{
-		if (g_client_pid == 0)
-			sa.sa_handler = &get_pid;
-		else
-			sa.sa_handler = &get_str;
-		sigaction(SIGUSR1, &sa, NULL);
-		sigaction(SIGUSR2, &sa, NULL);
 		pause();
-	}
 }
