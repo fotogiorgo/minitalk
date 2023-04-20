@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:43 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/20 18:03:04 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/20 20:00:17 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	send_len(char *str, int pid)
 	while (i < 32)
 	{
 		kill(pid, SIGUSR1 + (1 & (msg_len >> i)));
-		usleep(50);
+		usleep(10);
 		i++;
 	}
 	return (1);
@@ -47,7 +47,7 @@ void	send_msg(char *str, int server_pid)
 		c = *str;
 		while (i < 8)
 		{
-			usleep(50);
+			usleep(10);
 			kill(server_pid, SIGUSR1 + (1 & (c >> i)));
 			i++;
 		}
@@ -64,6 +64,12 @@ int	main(int argc, char **argv)
 	if (argc != 3)
 		return (0);
 	server_pid = ft_atoi(argv[1]);
+	if (kill(server_pid, 0) < 0)
+	{
+		write(1, "\033[0;31m", 8);
+		write(1, "Incorrect PID!\n", 16);
+		return (0);
+	}
 	if (!send_len(argv[2], server_pid))
 		return (0);
 	send_msg(argv[2], server_pid);
