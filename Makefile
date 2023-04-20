@@ -6,11 +6,11 @@
 #    By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/13 18:42:58 by jofoto            #+#    #+#              #
-#    Updated: 2023/04/18 20:41:23 by jofoto           ###   ########.fr        #
+#    Updated: 2023/04/19 18:11:17 by jofoto           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FLAGS =				-Wall -Wextra -Werror -g -fsanitize=address
+FLAGS =				-Wall -Wextra -Werror #-g -fsanitize=address
 
 SRC_SERVER =		server.c
 

@@ -6,7 +6,7 @@
 /*   By: jofoto <jofoto@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 18:58:45 by jofoto            #+#    #+#             */
-/*   Updated: 2023/04/18 20:46:06 by jofoto           ###   ########.fr       */
+/*   Updated: 2023/04/20 15:11:58 by jofoto           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 #define INT_MAX 2147483648
 
 /* SIGUSR1 == 30 SIGUSR2 == 31 */
-
 void	get_len(int sig, size_t *msg_len)
 {
 	static size_t	len = 0;
@@ -61,12 +60,12 @@ int	get_msg(char *msg, int sig, int msg_len)
 		return (0);
 }
 
-/* SIGUSR1 is for 0  and SIGUSR1 for 1*/
-void	dummy_handler2(int sig)
+/* SIGUSR1 is for 0  and SIGUSR2 for 1*/
+void	get_str(int sig)
 {
 	static char		*msg;
 	static size_t	msg_len;
-	
+
 	if (msg_len)
 	{
 		if (msg == NULL)
@@ -84,14 +83,14 @@ void	dummy_handler2(int sig)
 		get_len(sig, &msg_len);
 }
 
-/*	things work fine, except if you do 100 000 chars */
-int main(void)
+int	main(void)
 {
-	struct sigaction sa;
-	
-	sa.sa_handler = &dummy_handler2;
+	struct sigaction	sa;
+	sa.sa_handler = &get_str;
+
+	write(1, "\033[0;36mPID: ", 13);
 	ft_putnbr_fd(getpid(), 1);
-	write(1, "\n", 1);
+	write(1, "\033[0m\n", 6);
 	while (1)
 	{
 		sigaction(SIGUSR1, &sa, NULL);
